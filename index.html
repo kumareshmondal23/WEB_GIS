@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/proj4.js"></script>
+        <script src="js/proj4leaflet.js"></script>
+        <script src="data/Rabi_Crop_0.js"></script>
+        <script src="data/Zaid_Crop_1.js"></script>
+        <script src="data/Kharif_Crop_2.js"></script>
+        <script src="data/Crop_Class_3.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var crs = new L.Proj.CRS('EPSG:32634', '+proj=utm +zone=34 +datum=WGS84 +units=m +no_defs', {
+            resolutions: [2800, 1400, 700, 350, 175, 84, 42, 21, 11.2, 5.6, 2.8, 1.4, 0.7, 0.35, 0.14, 0.07],
+        });
+        var map = L.map('map', {
+            crs: crs,
+            continuousWorld: false,
+            worldCopyJump: false, 
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[38.357656569632866,21.064762798560512],[38.51616952041155,21.354627417840863]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        function pop_Rabi_Crop_0(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">gridcode</th>\
+                        <td>' + (feature.properties['gridcode'] !== null ? autolinker.link(feature.properties['gridcode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Category</th>\
+                        <td>' + (feature.properties['Category'] !== null ? autolinker.link(feature.properties['Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Rabi_Crop_0_0(feature) {
+            switch(String(feature.properties['Category'])) {
+                case 'High':
+                    return {
+                pane: 'pane_Rabi_Crop_0',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(143,225,110,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Low':
+                    return {
+                pane: 'pane_Rabi_Crop_0',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,168,19,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Moderate':
+                    return {
+                pane: 'pane_Rabi_Crop_0',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,244,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very High':
+                    return {
+                pane: 'pane_Rabi_Crop_0',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very Low':
+                    return {
+                pane: 'pane_Rabi_Crop_0',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,29,29,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Rabi_Crop_0');
+        map.getPane('pane_Rabi_Crop_0').style.zIndex = 400;
+        map.getPane('pane_Rabi_Crop_0').style['mix-blend-mode'] = 'normal';
+        var layer_Rabi_Crop_0 = new L.geoJson(json_Rabi_Crop_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Rabi_Crop_0',
+            layerName: 'layer_Rabi_Crop_0',
+            pane: 'pane_Rabi_Crop_0',
+            onEachFeature: pop_Rabi_Crop_0,
+            style: style_Rabi_Crop_0_0,
+        });
+        bounds_group.addLayer(layer_Rabi_Crop_0);
+        map.addLayer(layer_Rabi_Crop_0);
+        function pop_Zaid_Crop_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">gridcode</th>\
+                        <td>' + (feature.properties['gridcode'] !== null ? autolinker.link(feature.properties['gridcode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Category</th>\
+                        <td>' + (feature.properties['Category'] !== null ? autolinker.link(feature.properties['Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Zaid_Crop_1_0(feature) {
+            switch(String(feature.properties['Category'])) {
+                case 'High':
+                    return {
+                pane: 'pane_Zaid_Crop_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(143,225,110,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Low':
+                    return {
+                pane: 'pane_Zaid_Crop_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,168,19,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Moderate':
+                    return {
+                pane: 'pane_Zaid_Crop_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,244,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very High':
+                    return {
+                pane: 'pane_Zaid_Crop_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very Low':
+                    return {
+                pane: 'pane_Zaid_Crop_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,29,29,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Zaid_Crop_1');
+        map.getPane('pane_Zaid_Crop_1').style.zIndex = 401;
+        map.getPane('pane_Zaid_Crop_1').style['mix-blend-mode'] = 'normal';
+        var layer_Zaid_Crop_1 = new L.geoJson(json_Zaid_Crop_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Zaid_Crop_1',
+            layerName: 'layer_Zaid_Crop_1',
+            pane: 'pane_Zaid_Crop_1',
+            onEachFeature: pop_Zaid_Crop_1,
+            style: style_Zaid_Crop_1_0,
+        });
+        bounds_group.addLayer(layer_Zaid_Crop_1);
+        map.addLayer(layer_Zaid_Crop_1);
+        function pop_Kharif_Crop_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">gridcode</th>\
+                        <td>' + (feature.properties['gridcode'] !== null ? autolinker.link(feature.properties['gridcode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Category</th>\
+                        <td>' + (feature.properties['Category'] !== null ? autolinker.link(feature.properties['Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Kharif_Crop_2_0(feature) {
+            switch(String(feature.properties['Category'])) {
+                case 'High':
+                    return {
+                pane: 'pane_Kharif_Crop_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(143,225,110,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Low':
+                    return {
+                pane: 'pane_Kharif_Crop_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,168,19,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Moderate':
+                    return {
+                pane: 'pane_Kharif_Crop_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,244,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very High':
+                    return {
+                pane: 'pane_Kharif_Crop_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Very Low':
+                    return {
+                pane: 'pane_Kharif_Crop_2',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,29,29,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Kharif_Crop_2');
+        map.getPane('pane_Kharif_Crop_2').style.zIndex = 402;
+        map.getPane('pane_Kharif_Crop_2').style['mix-blend-mode'] = 'normal';
+        var layer_Kharif_Crop_2 = new L.geoJson(json_Kharif_Crop_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Kharif_Crop_2',
+            layerName: 'layer_Kharif_Crop_2',
+            pane: 'pane_Kharif_Crop_2',
+            onEachFeature: pop_Kharif_Crop_2,
+            style: style_Kharif_Crop_2_0,
+        });
+        bounds_group.addLayer(layer_Kharif_Crop_2);
+        map.addLayer(layer_Kharif_Crop_2);
+        function pop_Crop_Class_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Category</th>\
+                        <td>' + (feature.properties['Category'] !== null ? autolinker.link(feature.properties['Category'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Crop_Class_3_0(feature) {
+            switch(String(feature.properties['gridcode'])) {
+                case '3':
+                    return {
+                pane: 'pane_Crop_Class_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,29,29,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '8':
+                    return {
+                pane: 'pane_Crop_Class_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,244,86,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '12':
+                    return {
+                pane: 'pane_Crop_Class_3',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Crop_Class_3');
+        map.getPane('pane_Crop_Class_3').style.zIndex = 403;
+        map.getPane('pane_Crop_Class_3').style['mix-blend-mode'] = 'normal';
+        var layer_Crop_Class_3 = new L.geoJson(json_Crop_Class_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Crop_Class_3',
+            layerName: 'layer_Crop_Class_3',
+            pane: 'pane_Crop_Class_3',
+            onEachFeature: pop_Crop_Class_3,
+            style: style_Crop_Class_3_0,
+        });
+        bounds_group.addLayer(layer_Crop_Class_3);
+        map.addLayer(layer_Crop_Class_3);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Crop_Class<br /><table><tr><td style="text-align: center;"><img src="legend/Crop_Class_3_MonoCrop0.png" /></td><td>Mono Crop</td></tr><tr><td style="text-align: center;"><img src="legend/Crop_Class_3_DieCrop1.png" /></td><td>Die Crop</td></tr><tr><td style="text-align: center;"><img src="legend/Crop_Class_3_TriCrop2.png" /></td><td>Tri Crop</td></tr></table>': layer_Crop_Class_3,'Kharif_Crop<br /><table><tr><td style="text-align: center;"><img src="legend/Kharif_Crop_2_High0.png" /></td><td>High</td></tr><tr><td style="text-align: center;"><img src="legend/Kharif_Crop_2_Low1.png" /></td><td>Low</td></tr><tr><td style="text-align: center;"><img src="legend/Kharif_Crop_2_Moderate2.png" /></td><td>Moderate</td></tr><tr><td style="text-align: center;"><img src="legend/Kharif_Crop_2_VeryHigh3.png" /></td><td>Very High</td></tr><tr><td style="text-align: center;"><img src="legend/Kharif_Crop_2_VeryLow4.png" /></td><td>Very Low</td></tr></table>': layer_Kharif_Crop_2,'Zaid_Crop<br /><table><tr><td style="text-align: center;"><img src="legend/Zaid_Crop_1_High0.png" /></td><td>High</td></tr><tr><td style="text-align: center;"><img src="legend/Zaid_Crop_1_Low1.png" /></td><td>Low</td></tr><tr><td style="text-align: center;"><img src="legend/Zaid_Crop_1_Moderate2.png" /></td><td>Moderate</td></tr><tr><td style="text-align: center;"><img src="legend/Zaid_Crop_1_VeryHigh3.png" /></td><td>Very High</td></tr><tr><td style="text-align: center;"><img src="legend/Zaid_Crop_1_VeryLow4.png" /></td><td>Very Low</td></tr></table>': layer_Zaid_Crop_1,'Rabi_Crop<br /><table><tr><td style="text-align: center;"><img src="legend/Rabi_Crop_0_High0.png" /></td><td>High</td></tr><tr><td style="text-align: center;"><img src="legend/Rabi_Crop_0_Low1.png" /></td><td>Low</td></tr><tr><td style="text-align: center;"><img src="legend/Rabi_Crop_0_Moderate2.png" /></td><td>Moderate</td></tr><tr><td style="text-align: center;"><img src="legend/Rabi_Crop_0_VeryHigh3.png" /></td><td>Very High</td></tr><tr><td style="text-align: center;"><img src="legend/Rabi_Crop_0_VeryLow4.png" /></td><td>Very Low</td></tr></table>': layer_Rabi_Crop_0,}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
